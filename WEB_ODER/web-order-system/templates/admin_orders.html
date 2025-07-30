@@ -1,0 +1,38 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>실시간 주문 현황</h1>
+<div id="orders-list"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const socket = io();
+
+    socket.on('connect', function() {
+        console.log('Connected to server');
+    });
+
+    socket.on('new_order', function(data) {
+        const ordersList = document.getElementById('orders-list');
+        const orderEl = document.createElement('div');
+        orderEl.innerHTML = `<p>새 주문: 테이블 ${data.table_number} (주문번호: ${data.order_id}) <a href="/admin/orders/${data.order_id}">상세보기</a></p>`;
+        ordersList.prepend(orderEl);
+    });
+
+    // Load existing orders on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch("{{ url_for('get_orders') }}")
+            .then(response => response.json())
+            .then(data => {
+                const ordersList = document.getElementById('orders-list');
+                for (const order of data.orders) {
+                    const orderEl = document.createElement('div');
+                    orderEl.innerHTML = `<p>주문번호: ${order.id}, 테이블: ${order.table_number}, 상태: ${order.status} <a href="/admin/orders/${order.id}">상세보기</a></p>`;
+                    ordersList.appendChild(orderEl);
+                }
+            });
+    });
+</script>
+{% endblock %}

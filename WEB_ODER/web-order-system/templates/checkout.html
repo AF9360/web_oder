@@ -1,0 +1,36 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>주문 정보 입력</h1>
+<form id="checkout-form">
+    <label for="table_number">테이블 번호 또는 이름:</label>
+    <input type="text" id="table_number" name="table_number" required>
+    <button type="submit">주문 완료</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('checkout-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const tableNumber = document.getElementById('table_number').value;
+    const cart = JSON.parse(localStorage.getItem('cart')) || {};
+
+    fetch("{{ url_for('create_order') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ table_number: tableNumber, cart: cart })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            localStorage.removeItem('cart');
+            window.location.href = "{{ url_for('complete') }}";
+        }
+    });
+});
+</script>
+{% endblock %}

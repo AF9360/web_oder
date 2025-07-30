@@ -1,0 +1,42 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>장바구니</h1>
+<div id="cart-items"></div>
+<p>총 주문 금액: <span id="total-price">0</span>원</p>
+<a href="{{ url_for('checkout') }}">주문하기</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cartItemsContainer = document.getElementById('cart-items');
+        const totalPriceEl = document.getElementById('total-price');
+        let cart = JSON.parse(localStorage.getItem('cart')) || {};
+        let totalPrice = 0;
+
+        for (const id in cart) {
+            const item = cart[id];
+            const itemEl = document.createElement('div');
+            itemEl.innerHTML = `<p>${item.name} - ${item.price}원 x ${item.quantity} <button onclick="updateQuantity('${id}', -1)">-</button> <button onclick="updateQuantity('${id}', 1)">+</button></p>`;
+            cartItemsContainer.appendChild(itemEl);
+            totalPrice += item.price * item.quantity;
+        }
+
+        totalPriceEl.textContent = totalPrice;
+    });
+
+    function updateQuantity(id, change) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || {};
+        if (cart[id]) {
+            cart[id].quantity += change;
+            if (cart[id].quantity <= 0) {
+                delete cart[id];
+            }
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        window.location.reload(); // 간단하게 새로고침으로 처리
+    }
+</script>
+{% endblock %}

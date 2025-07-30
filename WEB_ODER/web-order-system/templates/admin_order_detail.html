@@ -1,0 +1,30 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>주문 상세 (주문번호: {{ order.id }})</h1>
+<p>테이블: {{ order.table_number }}</p>
+<p>총 금액: {{ order.total_price }}원</p>
+<p>상태: {{ order.status }}</p>
+
+<h2>주문 내역</h2>
+<ul>
+{% for item_id, item_details in items.items() %}
+    <li>{{ item_details.name }} x {{ item_details.quantity }}</li>
+{% endfor %}
+</ul>
+
+<hr>
+
+<h2>상태 변경</h2>
+<form action="{{ url_for('admin_order_detail', id=order.id) }}" method="post">
+    <select name="status">
+        <option value="접수" {% if order.status == '접수' %}selected{% endif %}>접수</option>
+        <option value="조리중" {% if order.status == '조리중' %}selected{% endif %}>조리중</option>
+        <option value="완료" {% if order.status == '완료' %}selected{% endif %}>완료</option>
+    </select>
+    <button type="submit">변경</button>
+</form>
+
+<a href="{{ url_for('admin_orders') }}">주문 목록으로 돌아가기</a>
+{% endblock %}

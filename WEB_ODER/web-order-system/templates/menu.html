@@ -1,0 +1,34 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>메뉴</h1>
+<div class="menu-container">
+    {% for item in menu_items %}
+    <div class="menu-item">
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.price }}원</p>
+        <button onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price }})">장바구니에 담기</button>
+    </div>
+    {% endfor %}
+</div>
+
+<hr>
+
+<a href="{{ url_for('cart') }}">장바구니 보기</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addToCart(id, name, price) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || {};
+    if (cart[id]) {
+        cart[id].quantity++;
+    } else {
+        cart[id] = { name: name, price: price, quantity: 1 };
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(name + '이(가) 장바구니에 추가되었습니다.');
+}
+</script>
+{% endblock %}
